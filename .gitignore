@@ -1,0 +1,42 @@
+# Dependencies and package-manager state
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+dist-ssr/
+build/
+out/
+
+# Local environment files and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+
+# Logs, caches, and test output
+*.log
+logs/
+.cache/
+.vite/
+.turbo/
+.eslintcache
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+
+# Editor and operating system files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# docs
+PROJECT_STRUCTURE.md

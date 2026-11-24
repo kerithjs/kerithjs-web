@@ -1,0 +1,16 @@
+{
+  "name": "kerithjs-web",
+  "private": true,
+  "packageManager": "pnpm@12.15.0",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev:docs": "pnpm --filter docs dev",
+    "dev:landing": "pnpm --filter landing dev",
+    "build": "pnpm --recursive --workspace-concurrency=1 --if-present run build",
+    "lint": "pnpm --recursive --workspace-concurrency=1 --if-present run lint",
+    "preview:docs": "pnpm --filter docs preview",
+    "preview:landing": "pnpm --filter landing preview"
+  }
+}
