@@ -13,6 +13,15 @@ interface SearchModalProps {
 
 export default function SearchModal({
   isOpen,
+  ...props
+}: SearchModalProps) {
+  if (!isOpen) return null;
+
+  return <SearchModalContent isOpen={isOpen} {...props} />;
+}
+
+function SearchModalContent({
+  isOpen,
   onClose,
   query,
   setQuery,
@@ -24,13 +33,8 @@ export default function SearchModal({
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => inputRef.current?.focus(), 50);
-      setActiveIndex(0);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [query]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -52,8 +56,6 @@ export default function SearchModal({
     return () => window.removeEventListener("keydown", handler);
   }, [isOpen, activeIndex, results, onClose]);
 
-  if (!isOpen) return null;
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]"
@@ -74,13 +76,19 @@ export default function SearchModal({
             ref={inputRef}
             type="text"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setActiveIndex(0);
+            }}
             placeholder="Search documentation..."
             className="flex-1 bg-transparent text-paper text-base placeholder:text-fog/40 outline-none font-inter-variable"
           />
           {query && (
             <button
-              onClick={() => setQuery("")}
+              onClick={() => {
+                setQuery("");
+                setActiveIndex(0);
+              }}
               className="text-fog hover:text-mist text-xs font-medium transition-colors shrink-0"
             >
               Clear

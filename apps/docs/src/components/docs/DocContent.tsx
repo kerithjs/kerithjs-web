@@ -1,4 +1,4 @@
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import remarkHeadingId from "remark-heading-id";
@@ -10,54 +10,70 @@ interface DocContentProps {
   content: string;
 }
 
+function omitNode<T extends { node?: unknown }>(props: T): Omit<T, "node"> {
+  const elementProps = { ...props };
+  delete elementProps.node;
+  return elementProps;
+}
+
 export default function DocContent({ content }: DocContentProps) {
   const { theme } = useTheme();
 
-  const markdownComponents = {
-    h1: ({ node, ...props }: any) => (
+  const markdownComponents: Components = {
+    h1: (props) => (
       <h1
         className="text-4xl font-semibold text-paper mt-12 mb-6 tracking-tight leading-tight font-inter-variable scroll-mt-20"
-        {...props}
+        {...omitNode(props)}
       />
     ),
-    h2: ({ node, ...props }: any) => (
+    h2: (props) => (
       <h2
         className="text-2xl font-semibold text-paper mt-10 mb-4 tracking-tight border-b border-graphite pb-2 font-inter-variable scroll-mt-20"
-        {...props}
+        {...omitNode(props)}
       />
     ),
-    h3: ({ node, ...props }: any) => (
+    h3: (props) => (
       <h3
         className="text-xl font-medium text-paper mt-8 mb-3 font-inter-variable scroll-mt-20"
-        {...props}
+        {...omitNode(props)}
       />
     ),
-    p: ({ node, ...props }: any) => (
-      <p className="text-base text-mist mb-4 leading-relaxed font-inter-variable" {...props} />
+    p: (props) => (
+      <p
+        className="text-base text-mist mb-4 leading-relaxed font-inter-variable"
+        {...omitNode(props)}
+      />
     ),
-    a: ({ node, ...props }: any) => (
+    a: (props) => (
       <a
         className="text-mist hover:text-paper underline decoration-graphite hover:decoration-paper transition-colors"
-        {...props}
+        {...omitNode(props)}
       />
     ),
-    ul: ({ node, ...props }: any) => (
-      <ul className="list-disc list-outside ml-6 mb-4 text-base text-mist space-y-2" {...props} />
+    ul: (props) => (
+      <ul
+        className="list-disc list-outside ml-6 mb-4 text-base text-mist space-y-2"
+        {...omitNode(props)}
+      />
     ),
-    ol: ({ node, ...props }: any) => (
-      <ol className="list-decimal list-outside ml-6 mb-4 text-base text-mist space-y-2" {...props} />
+    ol: (props) => (
+      <ol
+        className="list-decimal list-outside ml-6 mb-4 text-base text-mist space-y-2"
+        {...omitNode(props)}
+      />
     ),
-    li: ({ node, ...props }: any) => <li {...props} />,
-    code: ({ node, inline, className, children, ...props }: any) => {
+    li: (props) => <li {...omitNode(props)} />,
+    code: (props) => {
+      const { className, children, ...elementProps } = omitNode(props);
       const match = /language-(\w+)/.exec(className || "");
       const language = match ? match[1] : "";
       const isBlock = Boolean(match);
 
-      if (inline || !isBlock) {
+      if (!isBlock) {
         return (
           <code
             className="font-berkeley-mono text-caption text-mist bg-carbon px-1.5 py-0.5 rounded-none border border-graphite"
-            {...props}
+            {...elementProps}
           >
             {children}
           </code>
@@ -88,25 +104,29 @@ export default function DocContent({ content }: DocContentProps) {
         </div>
       );
     },
-    pre: ({ node, ...props }: any) => (
-      <>{props.children}</>
-    ),
-    blockquote: ({ node, ...props }: any) => (
-      <blockquote className="border-l border-smoke pl-4 italic text-fog mb-4" {...props} />
-    ),
-    table: ({ node, ...props }: any) => (
-      <div className="overflow-x-auto mb-6">
-        <table className="w-full text-left border-collapse" {...props} />
-      </div>
-    ),
-    th: ({ node, ...props }: any) => (
-      <th
-        className="border-b border-graphite py-2 px-4 font-semibold text-paper text-body-sm"
-        {...props}
+    pre: (props) => <>{omitNode(props).children}</>,
+    blockquote: (props) => (
+      <blockquote
+        className="border-l border-smoke pl-4 italic text-fog mb-4"
+        {...omitNode(props)}
       />
     ),
-    td: ({ node, ...props }: any) => (
-      <td className="border-b border-graphite py-2 px-4 text-mist text-body-sm" {...props} />
+    table: (props) => (
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-left border-collapse" {...omitNode(props)} />
+      </div>
+    ),
+    th: (props) => (
+      <th
+        className="border-b border-graphite py-2 px-4 font-semibold text-paper text-body-sm"
+        {...omitNode(props)}
+      />
+    ),
+    td: (props) => (
+      <td
+        className="border-b border-graphite py-2 px-4 text-mist text-body-sm"
+        {...omitNode(props)}
+      />
     ),
   };
 

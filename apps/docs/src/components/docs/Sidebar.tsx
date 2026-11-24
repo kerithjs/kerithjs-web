@@ -1,23 +1,56 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NavLink, Link, useLocation } from "react-router";
 import { ChevronRight } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Logo } from "@/components/icons/LogoR";
 import GithubIcon from "@/components/icons/Github";
 import { KERITH_DOCS_CONFIG } from "@/config/docs-manifest";
 
-function NavItem({ item }: { item: any }) {
-  const { label, to, icon: Icon, subItems } = item;
+interface NavSubItem {
+  label: string;
+  to: string;
+}
+
+type NavItemData =
+  | {
+      label: string;
+      icon?: LucideIcon;
+      subItems: NavSubItem[];
+      to?: never;
+    }
+  | {
+      label: string;
+      icon?: LucideIcon;
+      subItems?: undefined;
+      to: string;
+    };
+
+function NavItem({ item }: { item: NavItemData }) {
   const location = useLocation();
-
-  // Auto-expand if any subitem matches current path
-  const isParentActive = subItems?.some(
-    (s: any) => location.pathname === s.to || location.pathname + location.hash === s.to
+  const isParentActive = item.subItems?.some(
+    (subItem) =>
+      location.pathname === subItem.to ||
+      location.pathname + location.hash === subItem.to
   );
-  const [isOpen, setIsOpen] = useState(isParentActive ?? false);
 
-  useEffect(() => {
-    if (isParentActive) setIsOpen(true);
-  }, [isParentActive]);
+  return (
+    <NavItemContent
+      key={`${item.to ?? item.label}:${isParentActive}`}
+      item={item}
+      isParentActive={isParentActive ?? false}
+    />
+  );
+}
+
+function NavItemContent({
+  item,
+  isParentActive,
+}: {
+  item: NavItemData;
+  isParentActive: boolean;
+}) {
+  const { label, to, icon: Icon, subItems } = item;
+  const [isOpen, setIsOpen] = useState(isParentActive ?? false);
 
   if (subItems) {
     return (
@@ -48,7 +81,7 @@ function NavItem({ item }: { item: any }) {
         </button>
         {isOpen && (
           <div className="flex flex-col mt-1 mb-1 border-l border-graphite ml-3.75 pl-3 space-y-0.5">
-            {subItems.map((subItem: any) => {
+            {subItems.map((subItem) => {
               const isActive =
                 location.pathname + location.hash === subItem.to ||
                 location.pathname === subItem.to;
@@ -122,20 +155,24 @@ export default function Sidebar() {
             </h3>
 
             <div className="flex flex-col gap-0.5">
-              {pages.map((page: any, idx: number) => (
-                <NavItem
-                  key={idx}
-                  item={{
+              {pages.map((page) => {
+                const item: NavItemData = page.children
+                  ? {
                     label: page.title,
-                    to: `/docs/${page.file}`,
                     icon: page.icon,
-                    subItems: page.children?.map((child: any) => ({
+                    subItems: page.children.map((child) => ({
                       label: child.label,
                       to: child.path,
                     })),
-                  }}
-                />
-              ))}
+                  }
+                  : {
+                    label: page.title,
+                    to: `/docs/${page.file}`,
+                    icon: page.icon,
+                  };
+
+                return <NavItem key={page.id} item={item} />;
+              })}
             </div>
           </section>
         ))}

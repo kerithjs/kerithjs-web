@@ -1,5 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router";
-import Home from "@/pages/Home";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router";
 import DocsLayout from "@/layouts/DocsLayout";
 import DocsHome from "@/pages/docs/DocsHome";
 import DocsNotFound from "@/pages/docs/DocsNotFound";
@@ -10,7 +9,7 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/docs" replace />} />
 
         <Route path="/docs" element={<DocsLayout />}>
           <Route index element={<DocsHome />} />
