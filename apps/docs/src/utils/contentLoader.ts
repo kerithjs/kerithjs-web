@@ -1,7 +1,10 @@
 import { KERITH_DOCS_CONFIG } from '@/config/docs-manifest';
 
 // Using Vite's import.meta.glob to dynamically load markdown files as raw text.
-const contentModules = import.meta.glob('../content/**/*.md', { query: '?raw', import: 'default', eager: false });
+const contentModules = import.meta.glob<string>(
+  '../content/**/*.md',
+  { query: '?raw', import: 'default' },
+);
 
 /**
  * Loads the raw markdown content for a given slug.
@@ -9,9 +12,9 @@ const contentModules = import.meta.glob('../content/**/*.md', { query: '?raw', i
 export async function getDocContent(slug: string): Promise<string | null> {
   // Find the page in the manifest
   let pageFile: string | null = null;
-  
+
   for (const section of KERITH_DOCS_CONFIG.sections) {
-    const page = section.pages.find(p => p.id === slug);
+    const page = section.pages.find((p) => p.id === slug);
     if (page) {
       pageFile = page.file;
       break;
@@ -32,11 +35,7 @@ export async function getDocContent(slug: string): Promise<string | null> {
 
   try {
     const rawContent = await loader();
-    if (typeof rawContent === 'string') return rawContent;
-    if (rawContent && typeof rawContent === 'object' && 'default' in rawContent) {
-      return rawContent.default as string;
-    }
-    return null;
+    return typeof rawContent === 'string' ? rawContent : null;
   } catch (error) {
     console.error(`Error loading documentation for slug: ${slug}`, error);
     return null;
